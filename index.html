@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>WebVR Starter Kit - Video Sphere Example</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+        <style type="text/css">
+            #buttons > * {
+                color: black;
+                vertical-align: top;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript" src="build/vr.dev.js" charset="utf-8"></script>
+        <script type="text/javascript">
+        (function () {
+            /*
+            Scene from Mery Project - http://www.meryproject.com/
+            Video rendered by Pedro Fernando Gomez Fernandez - http://pedrofe.com/rendering-for-oculus-rift-with-arnold/
+            */
+
+            var video = VR.video({
+                stereo: 'horizontal',
+                sphere: true,
+
+                /*
+                Video sources are provided in two formats: mp4 and webm, as not all browsers can play
+                all formats. They are also provided in two sizes: 4096x2048 and 1024x512. The large
+                file may fail to play on certain devices (e.g. mobile). The script will detect failure
+                and fall back to the smaller file.
+
+                For successful fallback, sources should be sorted first by file format and then by size,
+                with the highest resolution files first.
+                */
+                src: [
+                    'examples/assets/mery.mp4',
+                    'examples/assets/mery-sm.mp4',
+                    'examples/assets/mery.webm',
+                    'examples/assets/mery-sm.webm'
+                ]
+            }).play();
+            video.muted = true;
+
+            video.on('error', function (evt) {
+                console.log('video error', evt);
+            });
+
+            video.on('play', function (evt) {
+                console.log('video play', evt);
+            });
+
+            video.on('pause', function (evt) {
+                console.log('video play', evt);
+            });
+
+            // shake to pause/play the video
+            VR.on('shake', function () {
+                if (video.paused) {
+                    video.play();
+                } else {
+                    video.pause();
+                }
+            });
+
+            var box = VR.box().moveX(-2);
+            VR.on('lookat', function (target) {
+              if (target === box) {
+                console.log("ur lookin at a box");
+                VR.animate(function (delta) {
+                    box.rotateY(delta * Math.PI);
+                    video.pause();
+                });
+              }
+            });
+            VR.on('lookaway', function (target) {
+              if (target === box) {
+                console.log("ur not lookin at a box anymore sonny");
+                VR.end();
+                video.play();
+              }
+            });
+
+            //make video element a global variable so the next script can access it
+            window.video = video.element;
+        }());
+        </script>
+    </body>
+</html>
