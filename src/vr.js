@@ -168,6 +168,7 @@
 		});
 
 		raycast();
+		console.log('yo');
 
 		vrEffect.render(scene, camera);
 
