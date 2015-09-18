@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>WebVR Starter Kit - Video Sphere Example</title>
+        <title>WebVR Test</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
         <style type="text/css">
             #buttons > * {
@@ -43,34 +43,18 @@
             }).play();
             video.muted = true;
 
-            video.on('error', function (evt) {
-                console.log('video error', evt);
-            });
-
-            video.on('play', function (evt) {
-                console.log('video play', evt);
-            });
-
-            video.on('pause', function (evt) {
-                console.log('video play', evt);
-            });
-
-            // shake to pause/play the video
-            VR.on('shake', function () {
-                if (video.paused) {
-                    video.play();
-                } else {
-                    video.pause();
-                }
-            });
+            // CROSSHAIR
+            // var img = VR.camera.image('http://i.imgur.com/gBbcvPo.png');
+            // img.setScale(0.1, 0.1, 0.1);
+            // img.moveZ(-1);
 
             var box = VR.box().moveX(-2);
             VR.on('lookat', function (target) {
               if (target === box) {
                 console.log("ur lookin at a box");
                 VR.animate(function (delta) {
-                    box.rotateY(delta * Math.PI);
-                    video.pause();
+                  box.rotateY(delta * Math.PI);
+                  video.pause();
                 });
               }
             });
@@ -80,6 +64,16 @@
                 VR.end();
                 video.play();
               }
+            });
+
+            var bunny = VR.video(['examples/assets/bigbuckbunny.mp4', 'examples/assets/bigbuckbunny.webm']).moveTo(-1, 2, 1).setScale(3).rotateY(Math.PI / 6).play();
+            bunny.object.material.transparent = true;
+            bunny.object.material.opacity = 0.5;
+
+            var deltaSum = 0;
+            VR.animate(function (delta) {
+              deltaSum += delta;
+              bunny.object.material.opacity = Math.sin(deltaSum);
             });
 
             //make video element a global variable so the next script can access it
