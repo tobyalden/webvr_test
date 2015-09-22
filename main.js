@@ -26,13 +26,15 @@ var box = VR.box().moveTo(8, 0.6, 2);
 box.object.material.transparent = true;
 box.object.material.opacity = 0.5;
 
-var popup = VR.video(['popup.mp4', 'popup.webm'])
+var popup = VR.video(['popup.mp4', 'popup.webm']);
 popup.object.material.transparent = true;
 popup.object.material.opacity = 0.8;
-popup.moveTo(4, 1.5, 3).rotateY(-1.3237312288136713);
+var popupStartPosition = new THREE.Vector3(4, 1.5, 3);
+var popupEndPosition = new THREE.Vector3(0.8002066314220428, 1.5, 3.807045474805805);
+popup.moveTo(4, 1.5, 3);
+popup.rotateY(-1.3237312288136713);
 popup.setScale(1, 0, 1);
 
-var deltaSum = 0;
 
 VR.on('lookat', function (target) {
   if (target === box) {
@@ -40,41 +42,36 @@ VR.on('lookat', function (target) {
       box.rotateY(delta * Math.PI);
       video.pause();
     });
-    activatePopup(popup);
+    togglePopup(popup, true, popupEndPosition);
   }
 });
 
-function activatePopup(vrObject) {
+VR.on('lookaway', function (target) {
+  if (target === popup) {
+    VR.end();
+    togglePopup(popup, false, popupStartPosition);
+    video.play();
+  }
+});
+
+function togglePopup(vrObject, isActivating, newPosition) {
+  deltaSum = 0;
   var startPosition = vrObject.position;
-  var endPosition = new THREE.Vector3(0.8002066314220428, 1.5, 3.807045474805805);
   VR.animate(function (delta) {
     deltaSum += delta;
     if(deltaSum > Math.PI/2) {
       deltaSum = Math.PI/2;
     }
-    vrObject.setScale(1, Math.sin(deltaSum), 1);
-    vrObject.moveTo(startPosition.x - (startPosition.x - endPosition.x) * Math.sin(deltaSum),
-                    startPosition.y - (startPosition.y - endPosition.y) * Math.sin(deltaSum),
-                    startPosition.z - (startPosition.z - endPosition.z) * Math.sin(deltaSum));
+    if(isActivating) {
+      vrObject.setScale(1, Math.sin(deltaSum), 1);
+    } else {
+      vrObject.setScale(1, 1 - Math.sin(deltaSum), 1);
+    }
+    vrObject.moveTo(startPosition.x - (startPosition.x - newPosition.x) * Math.sin(deltaSum),
+                    startPosition.y - (startPosition.y - newPosition.y) * Math.sin(deltaSum),
+                    startPosition.z - (startPosition.z - newPosition.z) * Math.sin(deltaSum));
   });
 }
-
-// START -> x: 4, y: 1.5, z: 3
-// END -> x: 1.0910969376564026, y: 1.5, z: 3.7336777043689144
-
-// VR.on('lookaway', function (target) {
-//   if (target === box) {
-//     VR.end();
-//     video.play();
-//   }
-// });
-
-// var deltaSum = 0;
-// VR.animate(function (delta) {
-//   deltaSum += delta;
-//   bunny.object.material.opacity = Math.sin(deltaSum);
-//   bunny.setScale(1, Math.sin(deltaSum) * 3, 1);
-// });
 
 //make video element a global variable so the next script can access it
 window.video = video.element;
