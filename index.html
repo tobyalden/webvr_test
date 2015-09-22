@@ -16,76 +16,74 @@
         <script type="text/javascript" src="build/vr.dev.js" charset="utf-8"></script>
         <script type="text/javascript">
         (function () {
-            /*
-            Scene from Mery Project - http://www.meryproject.com/
-            Video rendered by Pedro Fernando Gomez Fernandez - http://pedrofe.com/rendering-for-oculus-rift-with-arnold/
-            */
 
-            var video = VR.video({
-                stereo: 'horizontal',
-                sphere: true,
 
-                /*
-                Video sources are provided in two formats: mp4 and webm, as not all browsers can play
-                all formats. They are also provided in two sizes: 4096x2048 and 1024x512. The large
-                file may fail to play on certain devices (e.g. mobile). The script will detect failure
-                and fall back to the smaller file.
+          // CROSSHAIR
+          var crosshairTop = VR.camera.image('crosshair-top.png');
+          crosshairTop.moveZ(-1);
+          crosshairTop.moveY(0.015);
+          crosshairTop.setScale(0.05, 0.05, 0.05);
+          crosshairTop.object.material.transparent = true;
+          crosshairTop.object.material.opacity = 0.5;
 
-                For successful fallback, sources should be sorted first by file format and then by size,
-                with the highest resolution files first.
-                */
-                src: [
-                    'examples/assets/mery.mp4',
-                    'examples/assets/mery-sm.mp4',
-                    'examples/assets/mery.webm',
-                    'examples/assets/mery-sm.webm'
-                ]
-            }).play();
-            video.muted = true;
 
-            // CROSSHAIR
-            var crosshairTop = VR.camera.image('crosshair-top.png');
-            crosshairTop.moveZ(-1);
-            crosshairTop.moveY(0.015);
-            crosshairTop.setScale(0.05, 0.05, 0.05);
+          var crosshairBottom = VR.camera.image('crosshair-bottom.png');
+          crosshairBottom.moveZ(-1);
+          crosshairBottom.moveY(-0.015);
+          crosshairBottom.setScale(0.05, 0.05, 0.05);
+          crosshairBottom.object.material.transparent = true;
+          crosshairBottom.object.material.opacity = 0.5;
 
-            var crosshairBottom = VR.camera.image('crosshair-bottom.png');
-            crosshairBottom.moveZ(-1);
-            crosshairBottom.moveY(-0.015);
-            crosshairBottom.setScale(0.05, 0.05, 0.05);
 
-            var box = VR.box().moveX(-2);
-            VR.on('lookat', function (target) {
-              if (target === box) {
-                console.log("ur lookin at a box");
-                VR.animate(function (delta) {
-                  box.rotateY(delta * Math.PI);
-                  video.pause();
-                });
-              }
-            });
-            VR.on('lookaway', function (target) {
-              if (target === box) {
-                console.log("ur not lookin at a box anymore sonny");
-                VR.end();
-                video.play();
-              }
-            });
+          var video = VR.video({
+              // stereo: 'horizontal',
+              sphere: true,
 
-            var bunny = VR.video(['examples/assets/bigbuckbunny.mp4', 'examples/assets/bigbuckbunny.webm']).moveTo(-1, 2, 1).setScale(3).rotateY(Math.PI / 6).play();
-            bunny.object.material.transparent = true;
-            bunny.object.material.opacity = 0.5;
-            bunny.muted = true;
+              /*
+              Video sources are provided in two formats: mp4 and webm, as not all browsers can play
+              all formats. They are also provided in two sizes: 4096x2048 and 1024x512. The large
+              file may fail to play on certain devices (e.g. mobile). The script will detect failure
+              and fall back to the smaller file.
 
-            var deltaSum = 0;
-            VR.animate(function (delta) {
-              deltaSum += delta;
-              bunny.object.material.opacity = Math.sin(deltaSum);
-              bunny.setScale(1, Math.sin(deltaSum) * 3, 1);
-            });
+              For successful fallback, sources should be sorted first by file format and then by size,
+              with the highest resolution files first.
+              */
+              src: [
+                  'dock_large.webm'
+              ]
+          }).play();
+          video.muted = true;
 
-            //make video element a global variable so the next script can access it
-            window.video = video.element;
+          var box = VR.box().moveX(18).setScale(2.5);
+          box.object.material.transparent = true;
+          box.object.material.opacity = 0.5;
+
+          VR.on('lookat', function (target) {
+            if (target === box) {
+              console.log("ur lookin at a box");
+              VR.animate(function (delta) {
+                box.rotateY(delta * Math.PI);
+                video.pause();
+              });
+            }
+          });
+          VR.on('lookaway', function (target) {
+            if (target === box) {
+              console.log("ur not lookin at a box anymore sonny");
+              VR.end();
+              video.play();
+            }
+          });
+
+          // var deltaSum = 0;
+          // VR.animate(function (delta) {
+          //   deltaSum += delta;
+          //   bunny.object.material.opacity = Math.sin(deltaSum);
+          //   bunny.setScale(1, Math.sin(deltaSum) * 3, 1);
+          // });
+
+          //make video element a global variable so the next script can access it
+          window.video = video.element;
         }());
         </script>
     </body>

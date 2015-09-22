@@ -1,0 +1,3 @@
+- Simple interface for moving objects around
+- Hotspot interactions - progress cursor, video pop-up, close video
+- Cardboard deployment
