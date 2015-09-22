@@ -55,51 +55,63 @@ popup.moveTo(4, 1.5, 3);
 popup.rotateY(-1.3237312288136713);
 popup.setScale(1, 0, 1);
 
+var deltaSum = 0;
+var gazeTimer = 0;
 
 VR.on('lookat', function (target) {
   if (target === box) {
-    VR.animate(function (delta) {
-      box.rotateY(delta * Math.PI);
-      // video.pause();
-    });
-    // togglePopup(popup, true, popupEndPosition);
-    gazeAt();
+    VR.animate(rotateBox);
+    VR.animate(gazeAt);
   }
 });
 
 VR.on('lookaway', function (target) {
-  if (target === popup) {
-    VR.end();
-    // togglePopup(popup, false, popupStartPosition);
-    video.play();
+  if(target === box) {
+    VR.end(rotateBox);
+    endGaze();
+  } else if (target === popup) {
+    togglePopup(popup, false, popupStartPosition);
   }
 });
 
-var gazeTimer = 0;
-function gazeAt() {
-  VR.animate(function (delta) {
-    gazeTimer += delta;
-    if(gazeTimer > 3) {
-      crosshairBottomFocus4.object.material.opacity = 0;
-      crosshairBottomFocus3.object.material.opacity = 0;
-      crosshairTopFocus2.object.material.opacity = 0;
-      crosshairTopFocus1.object.material.opacity = 0;
-      togglePopup(popup, true, popupEndPosition);
-    } else if(gazeTimer > 2.25) {
-      crosshairBottomFocus4.object.material.opacity = 0.5;
-    } else if(gazeTimer > 1.5) {
-      crosshairBottomFocus3.object.material.opacity = 0.5;
-    } else if(gazeTimer > 0.75) {
-      crosshairTopFocus2.object.material.opacity = 0.5;
-    } else if(gazeTimer > 0) {
-      crosshairTopFocus1.object.material.opacity = 0.5;
-    }
-  });
+function rotateBox(delta) {
+  box.rotateY(delta * Math.PI);
 }
 
-var deltaSum = 0;
+function gazeAt(delta) {
+  gazeTimer += delta;
+  if(gazeTimer > 3) {
+    // VR.end();
+    togglePopup(popup, true, popupEndPosition);
+    endGaze();
+  } else if(gazeTimer > 2.25) {
+    crosshairBottomFocus4.object.material.opacity = 0.5;
+  } else if(gazeTimer > 1.5) {
+    crosshairBottomFocus3.object.material.opacity = 0.5;
+  } else if(gazeTimer > 0.75) {
+    crosshairTopFocus2.object.material.opacity = 0.5;
+  } else if(gazeTimer > 0) {
+    crosshairTopFocus1.object.material.opacity = 0.5;
+  }
+}
+
+function endGaze() {
+  VR.end(gazeAt)
+  gazeTimer = 0;
+  crosshairBottomFocus4.object.material.opacity = 0;
+  crosshairBottomFocus3.object.material.opacity = 0;
+  crosshairTopFocus2.object.material.opacity = 0;
+  crosshairTopFocus1.object.material.opacity = 0;
+}
+
 function togglePopup(vrObject, isActivating, newPosition) {
+  deltaSum = 0;
   var startPosition = vrObject.position;
+  if(isActivating) {
+    video.pause();
+  } else {
+    video.play();
+  }
   VR.animate(function (delta) {
     deltaSum += delta;
     if(deltaSum > Math.PI/2) {
